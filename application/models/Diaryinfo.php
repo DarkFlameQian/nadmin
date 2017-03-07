@@ -5,7 +5,7 @@
  * Date: 2017/3/7
  * Time: 下午2:56
  */
-class Mtest extends CI_Model
+class Diaryinfo extends CI_Model
 {
     function __construct()
     {

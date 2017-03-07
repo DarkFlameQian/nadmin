@@ -22,12 +22,12 @@ class Diary extends REST_Controller {
     }
     public function diary_get()
     {
-        $this->load->model('diary');
+        $this->load->model('diaryinfo');
         $today = $this->get('date');
         if($today == "") {
             $today = date('Y-m-d');
         }
-        $data = $this->mtest->getDiaryMain($today);
+        $data = $this->diaryinfo->getDiaryMain($today);
         if(!empty($data)) {
             $this->response($data, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
         } else {
