@@ -22,7 +22,7 @@ class Diary extends REST_Controller {
     }
     public function diary_get()
     {
-        $this->load->model('mtest');
+        $this->load->model('diary');
         $today = $this->get('date');
         if($today == "") {
             $today = date('Y-m-d');
