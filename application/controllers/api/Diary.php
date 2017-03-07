@@ -67,12 +67,18 @@ class Diary extends REST_Controller {
         $new_users_today = $tmp5[1]['new_users'];
         $new_users_yesterday = $tmp5[0]['new_users'];
         $active_users_today = $tmp5[1]['active_users'];
-        $active_users_yesterday = $tmp5[0]['avtive_users'];
+        $active_users_yesterday = $tmp5[0]['active_users'];
 
         $form_array = [];
         foreach ($tmp4 as $k=>$v) {
             $day = $v['day'];
             $form_array["$day"]['day'] = $day;
+            if(!isset($form_array["$day"]['post'])){
+                $form_array["$day"]['post'] = 0;
+            }
+            if(!isset($form_array["$day"]['reply'])){
+                $form_array["$day"]['reply'] = 0;
+            }
             $form_array["$day"]['post'] += $v['post_num'];
             $form_array["$day"]['reply'] += $v['reply_num'];
             $form_array["$day"]['rp-ratio'] = @round($form_array["$day"]['reply'] / $form_array["$day"]['post'], 2);
