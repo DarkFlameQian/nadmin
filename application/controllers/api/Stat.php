@@ -12,7 +12,7 @@ require APPPATH . '/libraries/REST_Controller.php';
 // use namespace
 use Restserver\Libraries\REST_Controller;
 
-class Diary extends REST_Controller {
+class Stat extends REST_Controller {
 
     function __construct()
     {
@@ -20,7 +20,7 @@ class Diary extends REST_Controller {
         parent::__construct();
 
     }
-
+    //日记
     public function diary_get()
     {
         $this->load->model('diaryinfo');
@@ -39,7 +39,7 @@ class Diary extends REST_Controller {
             $this->set_response($rs, REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
-
+    //每日数据
     public function  diarylist_get()
     {
         $today = $this->get('date');
@@ -91,6 +91,7 @@ class Diary extends REST_Controller {
         ];
         $this->response($data, REST_Controller::HTTP_OK);
     }
+    //每日数据
     public function diarytotal_get()
     {
         $today = $this->get('date');
