@@ -174,7 +174,7 @@ class Stat extends REST_Controller {
         if($date == "") {
             $date = date('Y-m-d');
         }
-        $this->load->model(users);
+        $this->load->model('users');
         $data = $this->users->getTodayUsers($date);
         if(!empty($data)) {
             $this->response($data, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
@@ -224,7 +224,8 @@ class Stat extends REST_Controller {
         array_multisort($total,SORT_DESC,$output_array);
         $this->response($output_array, REST_Controller::HTTP_OK);
     }
-
+    //http://www.ladybirdedu.com/nadmin/index.php/api/stat/apiversion?name=/home&date=2017-03-07&format=json
+    //路由比较麻烦
     public function apiversion_get()
     {
         $name = $this->get('name');
@@ -242,7 +243,7 @@ class Stat extends REST_Controller {
         } else {
             $rs = array(
                 'status' => FALSE,
-                'message' => 'User could not be found'
+                'message' => 'api could not be found'
             );
             $this->set_response($rs, REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
