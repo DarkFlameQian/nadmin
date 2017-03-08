@@ -40,7 +40,7 @@ class Diary extends REST_Controller {
         }
     }
 
-    public function diarytotal_get()
+    public function  diarytotal_get()
     {
         $today = $this->get('date');
         if($today == "") {
@@ -51,26 +51,12 @@ class Diary extends REST_Controller {
         $this->load->model('topic');
         $this->load->model('users');
 
-        $tmp1 = $this->diaryinfo->getDiaryInfo($today);
-        $tmp2 = $this->diaryinfo->getDiaryMonnth($today);
-        $tmp3 = $this->topic->getTopicNum($today);
-        $tmp4 = $this->topic->getTopicChangeNum($today);
-        $tmp5 = $this->users->getUsersNum($today);
-        $tmp6 = $this->users->getUsersChangeNum($today);
-
-        $diary_today = $tmp1[1]['diary_count'];
-        $diary_yesterday = $tmp1[0]['diary_count'];
-
-        $post_today = $tmp3[1]['post_num'];
-        $post_yesterday = $tmp3[0]['post_num'];
-
-        $new_users_today = $tmp5[1]['new_users'];
-        $new_users_yesterday = $tmp5[0]['new_users'];
-        $active_users_today = $tmp5[1]['active_users'];
-        $active_users_yesterday = $tmp5[0]['active_users'];
+        $tmp1 = $this->diaryinfo->getDiaryMonnth($today);
+        $tmp2 = $this->topic->getTopicChangeNum($today);
+        $tmp3 = $this->users->getUsersChangeNum($today);
 
         $form_array = [];
-        foreach ($tmp4 as $k=>$v) {
+        foreach ($tmp2 as $k=>$v) {
             $day = $v['day'];
             $form_array["$day"]['day'] = $day;
             if(!isset($form_array["$day"]['post'])){
@@ -84,14 +70,14 @@ class Diary extends REST_Controller {
             $form_array["$day"]['rp-ratio'] = @round($form_array["$day"]['reply'] / $form_array["$day"]['post'], 2);
         }
 
-        foreach ($tmp6 as $k=>$v) {
+        foreach ($tmp3 as $k=>$v) {
             $day = $v['day'];
             $form_array["$day"]['day'] = $day;
             $form_array["$day"]['new_users'] = $v['new_users'];
             $form_array["$day"]['active_users'] = $v['active_users'];
         }
 
-        foreach ($tmp2 as $k=>$v) {
+        foreach ($tmp1 as $k=>$v) {
             $day = $v['day'];
             $form_array["$day"]['day'] = $day;
             $form_array["$day"]['diary'] = $v['ios_diary_count'] + $v['android_diary_count'];
@@ -100,6 +86,37 @@ class Diary extends REST_Controller {
         }
 
         krsort($form_array);
+        $data = [
+            'form_array'       => $form_array
+        ];
+        $this->response($data, REST_Controller::HTTP_OK);
+    }
+    public function diarylist_get()
+    {
+        $today = $this->get('date');
+        if($today == "") {
+            $today = date('Y-m-d');
+        }
+
+        $this->load->model('diaryinfo');
+        $this->load->model('topic');
+        $this->load->model('users');
+
+        $tmp1 = $this->diaryinfo->getDiaryInfo($today);
+        $tmp2 = $this->topic->getTopicNum($today);
+        $tmp3 = $this->users->getUsersNum($today);
+
+        $diary_today = $tmp1[1]['diary_count'];
+        $diary_yesterday = $tmp1[0]['diary_count'];
+
+        $post_today = $tmp2[1]['post_num'];
+        $post_yesterday = $tmp2[0]['post_num'];
+
+        $new_users_today = $tmp3[1]['new_users'];
+        $new_users_yesterday = $tmp3[0]['new_users'];
+        $active_users_today = $tmp3[1]['active_users'];
+        $active_users_yesterday = $tmp3[0]['active_users'];
+
         $output_array = [
             'post_today' => $post_today,
             'post_yesterday' => $post_yesterday,
@@ -108,8 +125,7 @@ class Diary extends REST_Controller {
             'live_users_today' => $active_users_today,
             'live_users_yesterday' => $active_users_yesterday,
             'diary_today' => $diary_today,
-            'diary_yesterday' => $diary_yesterday,
-            'form_array' => $form_array
+            'diary_yesterday' => $diary_yesterday
         ];
 
         if ($output_array['post_yesterday'] > 0) {
@@ -145,8 +161,7 @@ class Diary extends REST_Controller {
             'today_live_users' => $output_array['live_users_today'],
             'live_users_ratio' => $live_users_ratio,
             'today_diary'      => $output_array['diary_today'],
-            'diary_ratio'      => $diary_ratio,
-            'form_array'       => $output_array['form_array']
+            'diary_ratio'      => $diary_ratio
         ];
 
         $this->response($data, REST_Controller::HTTP_OK);
