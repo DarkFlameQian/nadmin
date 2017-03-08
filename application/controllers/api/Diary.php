@@ -40,7 +40,7 @@ class Diary extends REST_Controller {
         }
     }
 
-    public function  diarytotal_get()
+    public function  diarylist_get()
     {
         $today = $this->get('date');
         if($today == "") {
@@ -91,7 +91,7 @@ class Diary extends REST_Controller {
         ];
         $this->response($data, REST_Controller::HTTP_OK);
     }
-    public function diarylist_get()
+    public function diarytotal_get()
     {
         $today = $this->get('date');
         if($today == "") {
