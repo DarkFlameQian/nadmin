@@ -29,4 +29,11 @@ class Users extends CI_Model
         $query = $this->db->query($sql);
         return $query->result_array();
     }
+
+    public function getTodayUsers($date)
+    {
+        $sql = "select day, new_users, active_users from `users_stat` where day='{$date}' limit 41";
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
 }

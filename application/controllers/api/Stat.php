@@ -167,4 +167,133 @@ class Stat extends REST_Controller {
 
         $this->response($data, REST_Controller::HTTP_OK);
     }
+    //用户映画
+    public function usersmain_get()
+    {
+        $date = $this->get('date');
+        if($date == "") {
+            $date = date('Y-m-d');
+        }
+        $this->load->model(users);
+        $data = $this->users->getTodayUsers($date);
+        if(!empty($data)) {
+            $this->response($data, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+        } else {
+            $rs = array(
+                'status' => FALSE,
+                'message' => 'User could not be found'
+            );
+            $this->set_response($rs, REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+    //API
+    public function apimain_get()
+    {
+        $date = $this->get('date');
+        if($date == "") {
+            $date = date('Y-m-d');
+        }
+        $this->load->model('apiinfo');
+        $output_array = $this->apiinfo->getTodayApi($date);
+        for ($i = 0; $i < count($output_array)-1; $i++) {
+            if ($output_array[$i]['day'] == $output_array[$i+1]['day'] && $output_array[$i]['api_name'] == $output_array[$i+1]['api_name']) {
+                $output_array[$i]['num_android'] = $output_array[$i+1]['num_ios'];
+                array_splice($output_array,$i+1,1);
+            } else {
+                if ($output_array[$i]['num_android'] == 21) {
+                    $output_array[$i]['num_android'] = $output_array[$i]['num_ios'];
+                    $output_array[$i]['num_ios'] = 0;
+                } else {
+                    $output_array[$i]['num_android'] = 0;
+                }
+            }
+        }
+        if ($i < count($output_array)) {
+            if ($output_array[$i]['num_android'] == 21) {
+                $output_array[$i]['num_android'] = $output_array[$i]['num_ios'];
+                $output_array[$i]['num_ios'] = 0;
+            } else {
+                $output_array[$i]['num_android'] = 0;
+            }
+        }
+        $total = array();
+        for ($i = 0;$i < count($output_array);$i++) {
+            $output_array[$i]['num_total'] = $output_array[$i]['num_ios'] + $output_array[$i]['num_android'];
+            $total[$i] = $output_array[$i]['num_total'];
+        }
+        array_multisort($total,SORT_DESC,$output_array);
+        $this->response($output_array, REST_Controller::HTTP_OK);
+    }
+
+    public function apiversion_get()
+    {
+        $name = $this->get('name');
+        $date = $this->get('date');
+        if($name === NULL ) {
+            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST);
+        }
+        if($date === NULL) {
+            $date = date('Y-m-d');
+        }
+        $this->load->model('apiinfo');
+        $data = $this->apiinfo->showApiVersion($name,$date);
+        if(!empty($data)) {
+            $this->response($data, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+        } else {
+            $rs = array(
+                'status' => FALSE,
+                'message' => 'User could not be found'
+            );
+            $this->set_response($rs, REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function apidetail_get()
+    {
+        $name = $this->get('name');
+        $end = $this->get('end');
+        $start = $this->get('start');
+        if($name === NULL ) {
+            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST);
+        }
+        if($end === NULL) {
+            $end = date('Y-m-d');
+        }
+        $month_ago = date('Y-m-d', strtotime('-1 Month', strtotime($end)));
+        if($start === NULL){
+            $start = $month_ago;
+        }
+        $this->load->model('apiinfo');
+        $output_array = $this->apiinfo->showApiDetail($name,$start,$end);
+        for ($i = 0;$i < count($output_array)-1;$i++){
+            if ($output_array[$i]['day'] == $output_array[$i+1]['day']){
+                $output_array[$i]['android_num'] = $output_array[$i+1]['ios_num'];
+                array_splice($output_array,$i+1,1);
+            } else {
+                if ($output_array[$i]['android_num'] == 21) {
+                    $output_array[$i]['android_num'] = $output_array[$i]['ios_num'];
+                    $output_array[$i]['ios_num'] = 0;
+                } else {
+                    $output_array[$i]['android_num'] = 0;
+                }
+            }
+        }
+        if ($i < count($output_array)){
+            if ($output_array[$i]['android_num'] == 21) {
+                $output_array[$i]['android_num'] = $output_array[$i]['ios_num'];
+                $output_array[$i]['ios_num'] = 0;
+            } else {
+                $output_array[$i]['android_num'] = 0;
+            }
+        }
+        $data = [
+            'api_name'        => $name,
+            'start'           => $start,
+            'end'             => $end,
+            'output_json_str' => json_encode($output_array)
+        ];
+        $this->response($data, REST_Controller::HTTP_OK);
+    }
+
+
 }
